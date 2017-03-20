@@ -39,6 +39,10 @@ for i = 1:numel(fields)
 end
 
 % print them out
+fileID = fopen('output.txt', 'w');
 for i = 1:numel(fields)
-  fprintf('Best %11s movie: %s.\n', fields{i}, results.(fields{i}).best);
+  fprintf(        'Best %11s movie: %s.\n', fields{i}, results.(fields{i}).best);
+  fprintf(fileID, 'Best %11s movie: %s.\n', fields{i}, results.(fields{i}).best);
 end
+
+fclose(fileID);
