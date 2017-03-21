@@ -1,48 +1,31 @@
-close all; clear; clc;
-
-% load data
-% fields = 'Action' 'Animation' 'Comedy' 'Drama' 'Documentary' 'Romance' 'Short'
+clear; close all; clc;
+format shortG;
 load './pg_movies.mat'
 
+% len = 212;
+% fields = { 'Action'
+%            'Animation'
+%            'Comedy'
+%            'Drama'
+%            'Documentary'
+%            'Romance'
+%            'Short'
+% };
 
-results = struct(...
-  'Action',      struct(), ...
-  'Animation',   struct(), ...
-  'Comedy',      struct(), ...
-  'Drama',       struct(), ...
-  'Documentary', struct(), ...
-  'Romance',     struct(), ...
-  'Short',       struct()  ...
-);
+% mat = compare_genres([pg_movies.Action, pg_movies.Animation, pg_movies.Comedy, pg_movies.Drama, pg_movies.Documentary, pg_movies.Romance, pg_movies.Short]);
+mat = compare_genres([pg_movies.Action, pg_movies.Drama, pg_movies.Romance]);
+% spy(mat)
 
-% do the comparisons
-fields = fieldnames(results);
-for i = 1:numel(fields)
-  comparisons = compare_movies(pg_movies.(fields{i}));
+[vecs, vals] = eig(mat);
+[val, idx]   = max(max(vals));    % extract largest Eigenvalue from matrix (flatten, find max)
 
-% get Eigenvectors and Eigenvalues
-  [vecs, vals] = eig(comparisons);
-  vals         = sum(vals);    % values are only on the diagonals and everything else is zero so we can flatten it with a column sum
-  [val, idx]   = max(vals);    % extract largest Eigenvalue
-  vec          = vecs(:, idx); % extract largest Eigenvector
-  [~,   idx]   = sort(vec);    % sort the Eigenvector to get indexes sorted (we care about the last one)
-  idx          = idx(end);     % pull out the index relating to the largest value
+fprintf('max Eigenvalue: %f.\n', val);
 
-  % store again. Keep track of the original matrix, the Eigenvalue
-  results.(fields{i}) = struct( ...
-    'mat', comparisons, ...
-    'vec', vec,                     ...
-    'val', val,                     ...
-    'best', pg_movies.title(idx),   ...
-    'best_idx', idx                 ...
-  );
+vec          = vecs(:, idx);       % extract largest Eigenvector
+[~,   idxs]   = sort(vec);         % sort the Eigenvector to get indexes sorted (we care about the last one)
+idxs          = idxs((end-2):end); % pull out the last three indexes
+
+% fprintf('best movie at position %d.\n', idx);
+for i = idxs
+  fprintf('%s.\n', pg_movies.title{i});
 end
-
-% print them out to console and file
-fileID = fopen('output.txt', 'w');
-for i = 1:numel(fields)
-  fprintf(        'Best %11s movie: %s.\n', fields{i}, results.(fields{i}).best);
-  fprintf(fileID, 'Best %11s movie: %s.\n', fields{i}, results.(fields{i}).best);
-end
-
-fclose(fileID);
