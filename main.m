@@ -12,7 +12,6 @@ load './pg_movies.mat'
 %            'Short'
 % };
 
-% mat = compare_genres([pg_movies.Action, pg_movies.Animation, pg_movies.Comedy, pg_movies.Drama, pg_movies.Documentary, pg_movies.Romance, pg_movies.Short]);
 mat = compare_genres([pg_movies.Action, pg_movies.Drama, pg_movies.Romance]);
 % spy(mat)
 
